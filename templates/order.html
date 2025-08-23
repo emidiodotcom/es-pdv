@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>PDV</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<header>
+  <h1>PDV</h1>
+  <nav>
+    <a href="#" class="active">Venda</a>
+    <a href="#">Config</a>
+    <a href="{% url 'admin:index' %}">Admin</a>
+    <a href="{% url 'logout' %}">Logout</a>
+  </nav>
+</header>
+
+<main>
+
+  <section class="product-pane">
+    <div class="categories">
+      <button class="active">Todos</button>
+      {% for cat in product_categories %}
+        <button>{{ cat.name }}</button>
+      {% endfor %}
+    </div>
+    <div class="products">
+      {% for product in products %}
+      <div class="product" onclick="addProduct('{{ product.id }}')"
+          title="{{ product.name }}">
+        <img
+        {% if product.image %}
+            src="{{ product.image.url }}"
+        {% else %}
+            src="/media/default-product.png"
+        {% endif %}
+            alt="[{{ product.name }}]">
+        <div class="product-name">{{ product.name }}</div>
+        <div class="product-price">R$ {{ product.price }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="order-pane">
+    <table class="orders">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Produto</th>
+          <th>Qtde</th>
+          <th>Unitário</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in order.products.all %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td>{{ item.product.name }}</td>
+          <td>{{ item.quantity }}</td>
+          <td>R$ {{ item.product.price }}</td>
+          <td>R$ {{ item.subtotal }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5">Nenhum item no pedido</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <div class="order-total">
+      Valor Total: R$ {{ order.total|default:"0,00" }}
+    </div>
+    <div class="actions">
+      <button class="cancel" onclick="cancelOrder()">Cancelar</button>
+      <button class="finalize" onclick="showPayment()">Receber e Finalizar</button>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <span>
+  {% if order %}
+  Pedido: {{ order.id }}
+  {% else %}
+  Nenhum pedido
+  </span>
+  {% endif %}
+</footer>
+
+<dialog id="payment-dialog">
+  <h2>Pagamento</h2>
+  <form method="POST" action="">
+    {% csrf_token %}
+    {{ add_payment_form.method }}
+    {{ add_payment_form.amount }}
+    <br>
+    <button type="submit" class="confirm">Confirmar</button>
+    <button type="button" class="cancel" onclick="hidePayment()">Cancelar</button>
+  </form>
+</dialog>
+
+<script>
+function showPayment() {
+  document.getElementById('payment-dialog').showModal();
+}
+
+function hidePayment() {
+  document.getElementById('payment-dialog').close();
+}
+
+function addProduct(productId) {
+  let form = document.createElement('form');
+  form.method = 'POST';
+  form.style.display = 'none';
+  form.innerHTML = '{% csrf_token %}' +
+                   '<input type="hidden" name="product" value="' + productId + '">' +
+                   '<input type="hidden" name="quantity" value="1">' +
+                   '<input type="hidden" name="action" value="add_product">';
+  document.body.appendChild(form);
+  form.submit();
+}
+
+function cancelOrder() {
+  if(confirm('Deseja realmente cancelar o pedido?')) {
+    let form = document.createElement('form');
+    form.method = 'POST';
+    form.style.display = 'none';
+    form.innerHTML = '{% csrf_token %}' +
+                     '<input type="hidden" name="action" value="cancel_order">';
+    document.body.appendChild(form);
+    form.submit();
+  }
+}
+</script>
+</body>
+</html>
