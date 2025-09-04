@@ -12,5 +12,7 @@ urlpatterns = [
     path('',        views.order, name='order'),
 ]
 
+admin.site.site_header = 'PDV - Administração'
+
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

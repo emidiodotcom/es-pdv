@@ -19,64 +19,64 @@
 
 <main>
 
-  <section class="product-pane">
-    <div class="categories">
-      <button class="active">Todos</button>
-      {% for cat in product_categories %}
-        <button>{{ cat.name }}</button>
-      {% endfor %}
+<section class="product-pane">
+  <div class="categories">
+    <button class="active">Todos</button>
+    {% for cat in product_categories %}
+      <button>{{ cat.name }}</button>
+    {% endfor %}
+  </div>
+  <div class="products">
+    {% for product in products %}
+    <div class="product" onclick="addProduct('{{ product.id }}')"
+        title="{{ product.name }}">
+      <img
+      {% if product.image %}
+          src="{{ product.image.url }}"
+      {% else %}
+          src="/media/default-product.png"
+      {% endif %}
+          alt="[{{ product.name }}]">
+      <div class="product-name">{{ product.name }}</div>
+      <div class="product-price">R$ {{ product.price }}</div>
     </div>
-    <div class="products">
-      {% for product in products %}
-      <div class="product" onclick="addProduct('{{ product.id }}')"
-          title="{{ product.name }}">
-        <img
-        {% if product.image %}
-            src="{{ product.image.url }}"
-        {% else %}
-            src="/media/default-product.png"
-        {% endif %}
-            alt="[{{ product.name }}]">
-        <div class="product-name">{{ product.name }}</div>
-        <div class="product-price">R$ {{ product.price }}</div>
-      </div>
-      {% endfor %}
-    </div>
-  </section>
+    {% endfor %}
+  </div>
+</section>
 
-  <section class="order-pane">
-    <table class="orders">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Produto</th>
-          <th>Qtde</th>
-          <th>Unitário</th>
-          <th>Total</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for item in order.products.all %}
-        <tr>
-          <td>{{ forloop.counter }}</td>
-          <td>{{ item.product.name }}</td>
-          <td>{{ item.quantity }}</td>
-          <td>R$ {{ item.product.price }}</td>
-          <td>R$ {{ item.subtotal }}</td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="5">Nenhum item no pedido</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    <div class="order-total">
-      Valor Total: R$ {{ order.total|default:"0,00" }}
-    </div>
-    <div class="actions">
-      <button class="cancel" onclick="cancelOrder()">Cancelar</button>
-      <button class="finalize" onclick="showPayment()">Receber e Finalizar</button>
-    </div>
-  </section>
+<section class="order-pane">
+  <table class="orders">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Produto</th>
+        <th>Qtde</th>
+        <th>Unitário</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in order.products.all %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ item.product.name }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>R$ {{ item.product.price }}</td>
+        <td>R$ {{ item.subtotal }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5">Nenhum item no pedido</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="order-total">
+    Valor Total: R$ {{ order.total|default:"0,00" }}
+  </div>
+  <div class="actions">
+    <button class="cancel" onclick="cancelOrder()">Cancelar</button>
+    <button class="finalize" onclick="showPayment()">Receber e Finalizar</button>
+  </div>
+</section>
 
 </main>
 
