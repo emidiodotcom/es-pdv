@@ -16,8 +16,9 @@
   <div class="products">
     {% for prod in products %}
     <div class="product" onclick="addProduct('{{ prod.id }}')"
+        data-id="{{ prod.id }}"
         data-category="{{ prod.category.id }}"
-        title="{{ prod.name }}">
+        title="({{ prod.id }}) {{ prod.name }}">
       <img
       {% if prod.image %}
           src="{{ prod.image.url }}"
@@ -32,7 +33,22 @@
   </div>
 </section>
 
-<section class="order-pane">
+<section class="order-pane" id="content">
+  <div class="query">
+    <input type="text" id="search-products" placeholder="Nome ou ID..."
+        onkeyup="searchProducts()">
+    <button title="Leitor código barras" class="barcode"
+        onclick="alert('Sem suporte no momento!')">
+      <svg>
+        <rect x="0"  y="2" width="2" height="28" fill="black"/>
+        <rect x="4"  y="2" width="4" height="28" fill="black"/>
+        <rect x="11" y="2" width="2" height="28" fill="black"/>
+        <rect x="16" y="2" width="6" height="28" fill="black"/>
+        <rect x="25" y="2" width="3" height="28" fill="black"/>
+      </svg>
+    </button>
+  </div>
+
   <table class="orders">
     <thead>
       <tr>
@@ -96,13 +112,35 @@ function filterProducts(categoryId) {
   event.target.classList.add('active');
 
   const products = document.querySelectorAll('.product');
-  products.forEach(prod => {
-    if (categoryId === 'all' || prod.dataset.category === categoryId) {
-      prod.style.display = 'block';
+  products.forEach(p => {
+    if (categoryId === 'all' || categoryId === p.dataset.category) {
+      p.style.display = 'block';
     } else {
-      prod.style.display = 'none';
+      p.style.display = 'none';
     }
   });
+}
+
+function searchProducts() {
+  const query = document.getElementById('search-products').value.toLowerCase();
+  const products = document.querySelectorAll('.product');
+
+  if (!query) {
+    products.forEach(p => p.style.display = 'block');
+    return;
+  }
+
+  const firstChar = query.charAt(0);
+  if (!isNaN(firstChar)) {
+    products.forEach(p =>
+      p.style.display = (query === p.dataset.id) ? 'block' : 'none'
+    );
+  } else {
+    products.forEach(p => {
+      const name = p.querySelector('.product-name').innerText.toLowerCase();
+      p.style.display = name.includes(query) ? 'block' : 'none';
+    });
+  }
 }
 
 function addProduct(productId) {
@@ -116,6 +154,19 @@ function addProduct(productId) {
   document.body.appendChild(form);
   form.submit();
 }
+
+document.getElementById('search-products').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    const visibleProducts = Array.from(document.querySelectorAll('.product'))
+      .filter(p => p.style.display !== 'none');
+
+    if (visibleProducts.length === 1) {
+      const productId = visibleProducts[0].dataset.id;
+      addProduct(productId);
+      this.value = '';
+    }
+  }
+});
 
 function cancelOrder() {
   if(confirm('Deseja realmente cancelar o pedido?')) {
