@@ -80,7 +80,7 @@ dialog {
 
 .messages {
   position: fixed;
-  top: 65px;
+  top: 90px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -171,8 +171,8 @@ section.product-pane {
 }
 
 .product img {
-  width: 80px;
-  height: 80px;
+  width: 60px;
+  height: 60px;
   object-fit: contain;
 }
 

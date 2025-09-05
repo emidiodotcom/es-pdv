@@ -7,24 +7,26 @@
 
 <section class="product-pane">
   <div class="categories">
-    <button class="active">Todos</button>
+    <button class="active" onclick="filterProducts('all')">Todos</button>
     {% for cat in product_categories %}
-      <button>{{ cat.name }}</button>
+      <button onclick="filterProducts('{{ cat.id }}')">{{ cat.name }}</button>
     {% endfor %}
   </div>
+
   <div class="products">
-    {% for product in products %}
-    <div class="product" onclick="addProduct('{{ product.id }}')"
-        title="{{ product.name }}">
+    {% for prod in products %}
+    <div class="product" onclick="addProduct('{{ prod.id }}')"
+        data-category="{{ prod.category.id }}"
+        title="{{ prod.name }}">
       <img
-      {% if product.image %}
-          src="{{ product.image.url }}"
+      {% if prod.image %}
+          src="{{ prod.image.url }}"
       {% else %}
           src="/media/default-product.png"
       {% endif %}
-          alt="[{{ product.name }}]">
-      <div class="product-name">{{ product.name }}</div>
-      <div class="product-price">R$ {{ product.price }}</div>
+          alt="[{{ prod.name }}]">
+      <div class="product-name">{{ prod.name }}</div>
+      <div class="product-price">R$ {{ prod.price }}</div>
     </div>
     {% endfor %}
   </div>
@@ -88,16 +90,23 @@
 </dialog>
 
 <script>
-function showPayment() {
-  document.getElementById('payment-dialog').showModal();
-}
+function filterProducts(categoryId) {
+  const buttons = document.querySelectorAll('.categories button');
+  buttons.forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
 
-function hidePayment() {
-  document.getElementById('payment-dialog').close();
+  const products = document.querySelectorAll('.product');
+  products.forEach(prod => {
+    if (categoryId === 'all' || prod.dataset.category === categoryId) {
+      prod.style.display = 'block';
+    } else {
+      prod.style.display = 'none';
+    }
+  });
 }
 
 function addProduct(productId) {
-  let form = document.createElement('form');
+  const form = document.createElement('form');
   form.method = 'POST';
   form.style.display = 'none';
   form.innerHTML = '{% csrf_token %}' +
@@ -110,7 +119,7 @@ function addProduct(productId) {
 
 function cancelOrder() {
   if(confirm('Deseja realmente cancelar o pedido?')) {
-    let form = document.createElement('form');
+    const form = document.createElement('form');
     form.method = 'POST';
     form.style.display = 'none';
     form.innerHTML = '{% csrf_token %}' +
@@ -118,6 +127,14 @@ function cancelOrder() {
     document.body.appendChild(form);
     form.submit();
   }
+}
+
+function showPayment() {
+  document.getElementById('payment-dialog').showModal();
+}
+
+function hidePayment() {
+  document.getElementById('payment-dialog').close();
 }
 </script>
 
