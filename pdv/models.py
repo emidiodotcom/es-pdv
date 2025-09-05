@@ -10,6 +10,9 @@ class Cashier(models.Model):
     def __str__(self):
         return f'{self.name}'
 
+    class Meta:
+        ordering = ['name']
+
 
 class ProductCategory(models.Model):
     name = models.CharField(max_length=30, unique=True)
@@ -20,6 +23,7 @@ class ProductCategory(models.Model):
     class Meta:
         verbose_name = 'Category'
         verbose_name_plural = 'Categories'
+        ordering = ['name']
 
 
 class Product(models.Model):
@@ -40,6 +44,9 @@ class Product(models.Model):
 
     def __str__(self):
         return f'{self.name}'
+
+    class Meta:
+        ordering = ['name']
 
 
 class Order(models.Model):
@@ -77,6 +84,9 @@ class Order(models.Model):
 
     def __str__(self):
         return f'id={self.id} created_at=<{self.created_at}> closed={self.closed}'
+
+    class Meta:
+        ordering = ['-created_at']
 
 
 class OrderProduct(models.Model):
@@ -118,3 +128,6 @@ class OrderPayment(models.Model):
 
     def __str__(self):
         return f'id={self.id} order=<{self.order}> method={self.method} paid_at=<{self.paid_at}>'
+
+    class Meta:
+        ordering = ['-paid_at']
