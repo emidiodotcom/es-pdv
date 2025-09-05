@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>{% block title %}{% endblock title %}</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<header>
+  <h1>PDV</h1>
+  <nav>
+    {% for item in header.nav_items %}
+      <a href="{{ item.url }}"
+      {% if item.active %}
+          class="active"
+      {% endif %}>
+      {{ item.name }}</a>
+    {% endfor %}
+  </nav>
+</header>
+
+<div class="messages">
+{% for message in messages %}
+  <dialog open
+        title="{{ message }}">
+    <form method="dialog">
+      <button class="{{ message.tags }}">{{ message }}</button>
+    </form>
+  </dialog>
+{% endfor %}
+</div>
+
+{% block content %}{% endblock content %}
+
+</body>
+</html>

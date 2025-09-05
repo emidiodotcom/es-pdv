@@ -1,22 +1,8 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="utf-8">
-<title>PDV</title>
-<link rel="stylesheet" href="/static/style.css">
-</head>
-<body>
+{% extends 'base.html' %}
 
-<header>
-  <h1>PDV</h1>
-  <nav>
-    <a href="#" class="active">Venda</a>
-    <a href="#">Config</a>
-    <a href="{% url 'admin:index' %}">Admin</a>
-    <a href="{% url 'logout' %}">Logout</a>
-  </nav>
-</header>
+{% block title %}PDV{% endblock title %}
 
+{% block content %}
 <main>
 
 <section class="product-pane">
@@ -70,22 +56,22 @@
     </tbody>
   </table>
   <div class="order-total">
-    Valor Total: R$ {{ order.total|default:"0,00" }}
+    Valor Total: R$ {{ order.total|default:'0,00' }}
   </div>
   <div class="actions">
     <button class="cancel" onclick="cancelOrder()">Cancelar</button>
-    <button class="finalize" onclick="showPayment()">Receber e Finalizar</button>
+    <button class="accept" onclick="">Receber e Finalizar</button>
   </div>
 </section>
 
 </main>
 
-<footer>
+<footer class="order">
   <span>
   {% if order %}
-  Pedido: {{ order.id }}
+    Pedido: {{ order.id }}
   {% else %}
-  Nenhum pedido
+    Nenhum pedido
   </span>
   {% endif %}
 </footer>
@@ -96,8 +82,7 @@
     {% csrf_token %}
     {{ add_payment_form.method }}
     {{ add_payment_form.amount }}
-    <br>
-    <button type="submit" class="confirm">Confirmar</button>
+    <button type="submit" class="accept">Confirmar</button>
     <button type="button" class="cancel" onclick="hidePayment()">Cancelar</button>
   </form>
 </dialog>
@@ -135,5 +120,5 @@ function cancelOrder() {
   }
 }
 </script>
-</body>
-</html>
+
+{% endblock content %}

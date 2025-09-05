@@ -1,10 +1,27 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.contrib import messages
 from django.utils import timezone
 
 from .forms import *
 from .models import *
 from .auth import *
+
+
+def get_header_context(active_view):
+    nav_items = [
+        {'name': 'Venda', 'view': 'order'},
+        {'name': 'Config', 'url': '#'},
+        {'name': 'Admin', 'view': 'admin:index'},
+    ]
+    if active_view == 'login':
+        nav_items += [{'name': 'Login', 'view': 'login'}]
+    else:
+        nav_items += [{'name': 'Logout', 'view': 'logout'}]
+    for item in nav_items:
+        if not 'url' in item:
+            item['url'] = reverse(item['view'])
+        item['active'] = item.get('view') == active_view
+    return {'nav_items': nav_items}
 
 
 def login(request):
@@ -21,7 +38,10 @@ def login(request):
                 return redirect('order')
     else:
         form = CashierLoginForm()
-    return render(request, 'login.html', {'form': form})
+    return render(request, 'login.html', {
+        'header': get_header_context(request.resolver_match.view_name),
+        'form': form
+    })
 
 
 def logout(request):
@@ -83,6 +103,7 @@ def order(request, cashier):
     categories = ProductCategory.objects.all()
     products = Product.objects.filter(is_active=True)
     return render(request, 'order.html', {
+        'header': get_header_context(request.resolver_match.view_name),
         'cashier': cashier,
         'order': order,
         'product_categories': categories,

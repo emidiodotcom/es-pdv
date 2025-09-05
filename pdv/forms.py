@@ -52,8 +52,8 @@ class UpdateQuantityForm(forms.Form):
 
 
 class AddPaymentForm(forms.Form):
-    method = forms.ChoiceField(choices=OrderPayment.METHOD_CHOICES, label="Forma de pagamento")
-    amount = forms.DecimalField(min_value=0.01, max_digits=10, decimal_places=2, label="Valor")
+    method = forms.ChoiceField(choices=OrderPayment.METHOD_CHOICES, label='Forma de pagamento')
+    amount = forms.DecimalField(min_value=0.01, max_digits=10, decimal_places=2, label='Valor')
 
     def save(self, order):
         payment = OrderPayment.objects.create(

@@ -1,23 +1,18 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="utf-8">
-<title>Login PDV</title>
-</head>
-<body>
-  <h1>Login</h1>
-  {% if messages %}
-    <ul>
-      {% for m in messages %}
-        <li>{{ m }}</li>
-      {% endfor %}
-    </ul>
-  {% endif %}
+{% extends 'base.html' %}
 
-  <form method="post">
+{% block title %}Login PDV{% endblock title %}
+
+{% block content %}
+<main>
+
+<section class="login">
+  <h2>Login</h2>
+  <form method="POST">
     {% csrf_token %}
     {{ form.cashier.label_tag }} {{ form.cashier }}
     <button type="submit">Entrar</button>
   </form>
-</body>
-</html>
+</section>
+
+</main>
+{% endblock content %}
