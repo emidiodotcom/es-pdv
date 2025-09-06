@@ -18,7 +18,6 @@ body {
 #jump-to-content {
   position: absolute;
   left: -9999px;
-  top: auto;
   width: 0;
   height: 0;
   overflow: hidden;
@@ -62,7 +61,6 @@ button {
   padding: 10px 15px;
   border: none;
   border-radius: 4px;
-  font-size: 1rem;
   font-weight: bold;
   cursor: pointer;
   background-color: #7c7c7c;
@@ -81,7 +79,7 @@ button.accept,
   color: #ffffff;
 }
 
-label, input, select {
+label, input, select, button {
   font-size: 1rem;
 }
 
@@ -216,33 +214,65 @@ section.order-pane {
   border-left: 1px solid #cccccc;
 }
 
-.order-pane .query {
+#product-select {
   display: flex;
   gap: 10px;
+  height: 35px;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.order-pane .query button.barcode {
+#product-select > * {
+  display: flex;
+  gap: 5px;
+  height: 100%;
+}
+
+#product-select button.icon {
   padding: 5px;
+  width: 35px;
+  text-shadow:
+    -1px -1px 0 #000,
+     1px -1px 0 #000,
+    -1px  1px 0 #000,
+     1px  1px 0 #000;
 }
 
-.order-pane .query button.barcode svg {
+#product-select button.icon svg {
   height: 24px;
   width: 30px;
   display: inline-block;
 }
 
-.orders {
+#product-quantity {
+  width: 8ch;
+}
+
+#order {
   flex: 1;
+  overflow: auto;
+  padding: 0 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px dashed #7c7c7c;
+}
+
+#order table {
+  width: 100%;
   border-collapse: collapse;
 }
 
-.orders th, .orders td {
+#order table .numeric {
+  text-align: right;
+}
+
+#order table th,
+#order table td {
   padding: 5px;
-  text-align: center;
+  text-align: left;
   border-bottom: 1px solid #cccccc;
 }
 
-.order-total {
+.total {
   font-size: 1.5rem;
   font-weight: bold;
   text-align: right;

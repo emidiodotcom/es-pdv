@@ -7,7 +7,9 @@
 
 <section class="product-pane">
   <div class="categories">
-    <button class="active" onclick="filterProducts('all')">Todos</button>
+    <button id="all-products-category" class="active" onclick="filterProducts('all')">
+      Todos
+    </button>
     {% for cat in product_categories %}
       <button onclick="filterProducts('{{ cat.id }}')">{{ cat.name }}</button>
     {% endfor %}
@@ -34,48 +36,67 @@
 </section>
 
 <section class="order-pane" id="content">
-  <div class="query">
-    <input type="text" id="search-products" placeholder="Nome ou ID..."
-        onkeyup="searchProducts()">
-    <button title="Leitor código barras" class="barcode"
-        onclick="alert('Sem suporte no momento!')">
-      <svg>
-        <rect x="0"  y="2" width="2" height="28" fill="black"/>
-        <rect x="4"  y="2" width="4" height="28" fill="black"/>
-        <rect x="11" y="2" width="2" height="28" fill="black"/>
-        <rect x="16" y="2" width="6" height="28" fill="black"/>
-        <rect x="25" y="2" width="3" height="28" fill="black"/>
-      </svg>
-    </button>
+  <div id="product-select">
+    <div>
+      <input type="text" id="search-products" placeholder="Nome ou ID..."
+          onkeyup="searchProducts()">
+      <button title="Leitor código barras" class="icon"
+          onclick="alert('Sem suporte no momento!')">
+        <svg>
+          <rect x="0"  y="2" width="2" height="21" fill="black"/>
+          <rect x="4"  y="2" width="3" height="21" fill="black"/>
+          <rect x="11" y="2" width="2" height="21" fill="black"/>
+          <rect x="16" y="2" width="5" height="21" fill="black"/>
+          <rect x="23" y="2" width="3" height="21" fill="black"/>
+        </svg>
+      </button>
+    </div>
+
+    &times;
+
+    <div>
+      <input type="text" id="product-quantity" placeholder="Qtde"
+          maxlength=4
+          onkeyup="searchProducts()">
+      <button title="Medir peso" class="icon"
+          onclick="alert('Sem suporte no momento!')">
+        ⚖️
+      </button>
+    </div>
   </div>
 
-  <table class="orders">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Produto</th>
-        <th>Qtde</th>
-        <th>Unitário</th>
-        <th>Total</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for item in order.products.all %}
-      <tr>
-        <td>{{ forloop.counter }}</td>
-        <td>{{ item.product.name }}</td>
-        <td>{{ item.quantity }}</td>
-        <td>R$ {{ item.product.price }}</td>
-        <td>R$ {{ item.subtotal }}</td>
-      </tr>
-      {% empty %}
-      <tr><td colspan="5">Nenhum item no pedido</td></tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  <div class="order-total">
+  <div id="order">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Produto</th>
+          <th>Qtde</th>
+          <th>Unitário</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in order.products.all %}
+        <tr>
+          <td class="numeric">{{ forloop.counter }}</td>
+          <td>{{ item.product.name }}</td>
+          <td class="numeric">{{ item.quantity }}</td>
+          <td class="numeric">R$ {{ item.product.price }}</td>
+          <td class="numeric">R$ {{ item.subtotal }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5">Nenhum item no pedido</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+  </div>
+
+  <div class="total">
     Valor Total: R$ {{ order.total|default:'0,00' }}
   </div>
+
   <div class="actions">
     <button class="cancel" onclick="cancelOrder()">Cancelar</button>
     <button class="accept" onclick="">Receber e Finalizar</button>
@@ -90,8 +111,8 @@
     Pedido: {{ order.id }}
   {% else %}
     Nenhum pedido
-  </span>
   {% endif %}
+  </span>
 </footer>
 
 <dialog id="payment-dialog">
@@ -106,10 +127,10 @@
 </dialog>
 
 <script>
-function filterProducts(categoryId) {
+function filterProducts(categoryId, newActive=event.target) {
   const buttons = document.querySelectorAll('.categories button');
   buttons.forEach(btn => btn.classList.remove('active'));
-  event.target.classList.add('active');
+  newActive.classList.add('active');
 
   const products = document.querySelectorAll('.product');
   products.forEach(p => {
@@ -124,6 +145,8 @@ function filterProducts(categoryId) {
 function searchProducts() {
   const query = document.getElementById('search-products').value.toLowerCase();
   const products = document.querySelectorAll('.product');
+
+  filterProducts('all', document.getElementById('all-products-category'));
 
   if (!query) {
     products.forEach(p => p.style.display = 'block');
@@ -158,12 +181,11 @@ function addProduct(productId) {
 document.getElementById('search-products').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') {
     const visibleProducts = Array.from(document.querySelectorAll('.product'))
-      .filter(p => p.style.display !== 'none');
+        .filter(p => p.style.display !== 'none');
 
     if (visibleProducts.length === 1) {
       const productId = visibleProducts[0].dataset.id;
       addProduct(productId);
-      this.value = '';
     }
   }
 });
