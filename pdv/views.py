@@ -92,6 +92,8 @@ def order(request, cashier):
         if cancel_order or order.products.count() == 0:
             order.delete()
             order = None
+
+        request.session['last_action'] = action
         return redirect('order')
 
     categories = ProductCategory.objects.all()

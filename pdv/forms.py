@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django import forms
 from django.shortcuts import get_object_or_404
 
@@ -45,7 +47,17 @@ class UpdateQuantityForm(forms.Form):
 
 class AddPaymentForm(forms.Form):
     method = forms.ChoiceField(choices=OrderPayment.METHOD_CHOICES, label='Forma de pagamento')
-    amount = forms.DecimalField(min_value=0.01, max_digits=10, decimal_places=2, label='Valor')
+    amount = forms.CharField(label='Valor')
+
+    def clean_amount(self):
+        data = self.cleaned_data['amount'].replace(',', '.')
+        try:
+            value = Decimal(data)
+            if value < 0.01 or value >= 10**8:
+                raise forms.ValidationError
+        except:
+            raise forms.ValidationError('Valor inválido')
+        return value
 
     def save(self, order):
         payment = OrderPayment.objects.create(
