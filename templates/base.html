@@ -13,11 +13,9 @@
   <h1>PDV</h1>
   <nav>
     {% for item in header.nav_items %}
-      <a href="{{ item.url }}"
-      {% if item.active %}
-          class="active"
-      {% endif %}>
-      {{ item.name }}</a>
+    <a href="{{ item.url }}"{% if item.active %} class="active"{% endif %}>
+      {{ item.name }}
+    </a>
     {% endfor %}
   </nav>
 </header>

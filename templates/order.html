@@ -11,7 +11,7 @@
       Todos
     </button>
     {% for cat in product_categories %}
-      <button onclick="filterProducts('{{ cat.id }}')">{{ cat.name }}</button>
+    <button onclick="filterProducts('{{ cat.id }}')">{{ cat.name }}</button>
     {% endfor %}
   </div>
 
@@ -20,14 +20,10 @@
     <div class="product" onclick="addProduct('{{ prod.id }}')"
         data-id="{{ prod.id }}"
         data-category="{{ prod.category.id }}"
-        title="({{ prod.id }}) {{ prod.name }}">
-      <img
-      {% if prod.image %}
-          src="{{ prod.image.url }}"
-      {% else %}
-          src="/media/default-product.png"
-      {% endif %}
-          alt="[{{ prod.name }}]">
+        title="{{ prod.id }} - {{ prod.name }} ({{ prod.category }})">
+      <img{% if prod.image %} src="{{ prod.image.url }}"
+      {% else %} src="/media/default-product.png"
+      {% endif %}    alt="[{{ prod.name }}]">
       <div class="product-name">{{ prod.name }}</div>
       <div class="product-price">R$ {{ prod.price }}</div>
     </div>
@@ -63,30 +59,40 @@
         ⚖️
       </button>
     </div>
+
+    <button title="Adicionar produto" class="accept"
+        onclick="addProductWithSearch()">
+      ✔
+    </button>
   </div>
 
   <div id="order">
     <table>
       <thead>
         <tr>
-          <th>#</th>
+          <th class="numeric">#</th>
           <th>Produto</th>
-          <th>Qtde</th>
-          <th>Unitário</th>
-          <th>Total</th>
+          <th class="numeric">Qtde</th>
+          <th class="numeric">Unitário</th>
+          <th class="numeric">Total</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
         {% for item in order.products.all %}
-        <tr>
+        <tr title="{{ item.product.id }} - {{ item.product.name }} ({{ item.product.category }})">
           <td class="numeric">{{ forloop.counter }}</td>
           <td>{{ item.product.name }}</td>
           <td class="numeric">{{ item.quantity }}</td>
           <td class="numeric">R$ {{ item.product.price }}</td>
           <td class="numeric">R$ {{ item.subtotal }}</td>
+          <td>
+            <button title="Remover produto" type="button"
+                onclick="removeProduct('{{ item.id }}')">❌</button>
+          </td>
         </tr>
         {% empty %}
-        <tr><td colspan="5">Nenhum item no pedido</td></tr>
+        <tr><td colspan="6">Nenhum item no pedido</td></tr>
         {% endfor %}
       </tbody>
     </table>
@@ -106,6 +112,12 @@
 </main>
 
 <footer class="order">
+  <span>
+    Caixa: {{ cashier.name }}
+  </span>
+
+  &vert;
+
   <span>
   {% if order %}
     Pedido: {{ order.id }}
@@ -128,11 +140,11 @@
 
 <script>
 function filterProducts(categoryId, newActive=event.target) {
-  const buttons = document.querySelectorAll('.categories button');
+  const buttons = document.querySelectorAll('.product-pane .categories button');
   buttons.forEach(btn => btn.classList.remove('active'));
   newActive.classList.add('active');
 
-  const products = document.querySelectorAll('.product');
+  const products = document.querySelectorAll('.product-pane .product');
   products.forEach(p => {
     if (categoryId === 'all' || categoryId === p.dataset.category) {
       p.style.display = 'block';
@@ -144,7 +156,7 @@ function filterProducts(categoryId, newActive=event.target) {
 
 function searchProducts() {
   const query = document.getElementById('search-products').value.toLowerCase();
-  const products = document.querySelectorAll('.product');
+  const products = document.querySelectorAll('.product-pane .product');
 
   filterProducts('all', document.getElementById('all-products-category'));
 
@@ -166,29 +178,62 @@ function searchProducts() {
   }
 }
 
-function addProduct(productId) {
+function addProduct(productId, quantity) {
+  if (!quantity)
+    quantity = prompt("Quantidade:");
+  if (quantity === null)
+    return;
+  quantity = quantity >= 1 ? quantity : 1;
   const form = document.createElement('form');
   form.method = 'POST';
   form.style.display = 'none';
   form.innerHTML = '{% csrf_token %}' +
                    '<input type="hidden" name="product" value="' + productId + '">' +
-                   '<input type="hidden" name="quantity" value="1">' +
+                   '<input type="hidden" name="quantity" value="' + quantity + '">' +
                    '<input type="hidden" name="action" value="add_product">';
   document.body.appendChild(form);
   form.submit();
 }
 
+function addProductWithQuantity(productId) {
+  const quantity = document.getElementById('product-quantity').value;
+  addProduct(productId, quantity);
+}
+
+function addProductWithSearch() {
+  const visibleProducts = Array.from(document.querySelectorAll('.product-pane .product'))
+      .filter(p => p.style.display !== 'none');
+  if (visibleProducts.length === 1) {
+    const productId = visibleProducts[0].dataset.id;
+    addProductWithQuantity(productId);
+  }
+}
+
 document.getElementById('search-products').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') {
-    const visibleProducts = Array.from(document.querySelectorAll('.product'))
-        .filter(p => p.style.display !== 'none');
-
-    if (visibleProducts.length === 1) {
-      const productId = visibleProducts[0].dataset.id;
-      addProduct(productId);
-    }
+    addProductWithSearch();
   }
 });
+
+document.getElementById('product-quantity').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    addProductWithSearch();
+  }
+});
+
+function removeProduct(productId) {
+  if (confirm('Remover este item do pedido?')) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.style.display = 'none';
+    form.innerHTML = '{% csrf_token %}' +
+                     '<input type="hidden" name="item_id" value="' + productId + '">' +
+                     '<input type="hidden" name="quantity" value="0">' +
+                     '<input type="hidden" name="action" value="update_quantity">';
+    document.body.appendChild(form);
+    form.submit();
+  }
+}
 
 function cancelOrder() {
   if(confirm('Deseja realmente cancelar o pedido?')) {
@@ -210,5 +255,4 @@ function hidePayment() {
   document.getElementById('payment-dialog').close();
 }
 </script>
-
 {% endblock content %}

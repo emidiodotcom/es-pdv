@@ -29,14 +29,6 @@ class AddProductForm(forms.Form):
             item.save()
 
 
-class RemoveProductForm(forms.Form):
-    item_id = forms.IntegerField(widget=forms.HiddenInput())
-
-    def save(self, order):
-        item = get_object_or_404(OrderProduct, pk=self.cleaned_data['item_id'], order=order)
-        item.delete()
-
-
 class UpdateQuantityForm(forms.Form):
     item_id = forms.IntegerField(widget=forms.HiddenInput())
     quantity = forms.IntegerField(min_value=0, label='Quantidade')

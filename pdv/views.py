@@ -67,12 +67,6 @@ def order(request, cashier):
                 form.save(order)
             else:
                 messages.error(request, 'Erro ao adicionar produto.')
-        elif action == 'remove_product':
-            form = RemoveProductForm(request.POST)
-            if form.is_valid():
-                form.save(order)
-            else:
-                messages.error(request, 'Erro ao remover produto.')
         elif action == 'update_quantity':
             form = UpdateQuantityForm(request.POST)
             if form.is_valid():
@@ -109,7 +103,6 @@ def order(request, cashier):
         'product_categories': categories,
         'products': products,
         'add_product_form': AddProductForm(),
-        'remove_product_form': RemoveProductForm(),
         'update_quantity_form': UpdateQuantityForm(),
         'add_payment_form': AddPaymentForm(),
     })
