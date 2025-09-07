@@ -10,6 +10,9 @@ class Cashier(models.Model):
     def __str__(self):
         return f'{self.name}'
 
+    def __repr__(self):
+        return f'<Cashier: {self.name}>'
+
     class Meta:
         ordering = ['name']
 
@@ -19,6 +22,9 @@ class ProductCategory(models.Model):
 
     def __str__(self):
         return f'{self.name}'
+
+    def __repr__(self):
+        return f'<ProductCategory: {self.name}>'
 
     class Meta:
         verbose_name = 'Category'
@@ -43,7 +49,10 @@ class Product(models.Model):
         return locale.currency(self.price, grouping=True)
 
     def __str__(self):
-        return f'{self.name}'
+        return f'{self.id} - {self.name} ({self.category})'
+
+    def __repr__(self):
+        return f'<Product: id={self.id} name="{self.name}" category="{self.category}">'
 
     class Meta:
         ordering = ['name']
@@ -83,7 +92,10 @@ class Order(models.Model):
         return locale.currency(self.total_paid, grouping=True)
 
     def __str__(self):
-        return f'id={self.id} created_at=<{self.created_at}> closed={self.closed}'
+        return f'Pedido #{self.id}'
+
+    def __repr__(self):
+        return f'<Order: id={self.id} created_at=<{self.created_at}> closed={self.closed}>'
 
     class Meta:
         ordering = ['-created_at']
@@ -105,7 +117,10 @@ class OrderProduct(models.Model):
         return locale.currency(self.subtotal, grouping=True)
 
     def __str__(self):
-        return f'id={self.id} order=<{self.order}> product={self.product} quantity={self.quantity}'
+        return f'Produto de Pedido #{self.id}'
+
+    def __repr__(self):
+        return f'<OrderProduct: id={self.id} order={self.order.id} product={self.product.id} quantity={self.quantity}>'
 
 
 class OrderPayment(models.Model):
@@ -127,7 +142,10 @@ class OrderPayment(models.Model):
         return locale.currency(self.amount, grouping=True)
 
     def __str__(self):
-        return f'id={self.id} order=<{self.order}> method={self.method} paid_at=<{self.paid_at}>'
+        return f'Pagamento #{self.id} em {self.method}'
+
+    def __repr__(self):
+        return f'<OrderPayment: id={self.id} order={self.order.id} method={self.method} paid_at=<{self.paid_at}>>'
 
     class Meta:
         ordering = ['-paid_at']
