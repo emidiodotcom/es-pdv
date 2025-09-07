@@ -83,11 +83,15 @@ def order(request, cashier):
             cancel_order = True
             messages.info(request, 'Pedido cancelado.')
         elif action == 'finish_order':
-            if order.total_paid >= order.total:
-                order.close()
-                messages.success(request, 'Pedido finalizado!')
-            else:
+            if order.total_paid < order.total:
                 messages.error(request, 'Pagamento insuficiente.')
+                return redirect('order')
+            for item in order.products.all():
+                if item.quantity > item.product.stock:
+                    messages.error(request, f'Estoque do {item.product.name} insuficiente')
+                    return redirect('order')
+            order.close()
+            messages.success(request, 'Pedido finalizado!')
 
         if cancel_order or order.products.count() == 0:
             order.delete()
